@@ -1,0 +1,29 @@
+{
+  "name": "fe-w3-shopping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "express.js",
+  "scripts": {
+    "build": "node-sass public/style/style.scss public/style/style.css && node-sass --watch public/style/style.scss public/style/style.css",
+    "dev": "nodemon express.js -e js,json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skawnkk/fe-w5-searchUI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skawnkk/fe-w5-searchUI"
+  },
+  "homepage": "https://github.com/skawnkk/fe-w5-searchUI#readme",
+  "devDependencies": {
+    "node-sass": "^5.0.0",
+    "nodemon": "^2.0.7",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
