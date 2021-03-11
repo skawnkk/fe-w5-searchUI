@@ -27,19 +27,23 @@ const playCarousel = () => new RequestData(requestUrlForSection1, requestInfoFor
 const loadBannerImg = () => new RequestData(requestUrlForSection1, requestInfoForSection1_banner, 'banner');
 
 const ctrlCarouselBtn = () => {
-   const slideArea = _.$('.slide_second_position');
-   const slideNextBtn = _.$(".evt_main .next");
-   const slidePrevBtn = _.$(".evt_main .prev");
-   const value = 'carousel';
-   return new CarouselCtrl(slidePrevBtn, slideNextBtn, slideArea, value);
+   const carouselObj = {
+      slideArea:_.$('.slide_second_position'),
+      slideNextBtn:_.$(".evt_main .next"),
+      slidePrevBtn:_.$(".evt_main .prev"),
+      value:'carousel'
+   }
+   return new CarouselCtrl(carouselObj);
 }
 
 const ctrlCarouselBtn_hot = () => {
-   const slideArea = _.$('.hot_deal_list');
-   const slideNextBtn = _.$(".slide_hot_deal .next");
-   const slidePrevBtn = _.$(".slide_hot_deal .prev");
-   const value = 'carousel_hot';
-   return new CarouselCtrl(slidePrevBtn, slideNextBtn, slideArea, value);
+   const carouselObj = {
+      slideArea:  _.$('.hot_deal_list'),
+      slideNextBtn: _.$(".slide_hot_deal .next"),
+      slidePrevBtn : _.$(".slide_hot_deal .prev"),
+      value : 'carousel_hot'
+   }
+   return new CarouselCtrl(carouselObj);
 }
 
 const viewMoreUrlSetting = () => {

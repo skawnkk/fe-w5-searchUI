@@ -81,7 +81,8 @@ p {
       z-index: 9999;
       width: fit-content;
       position: relative;
-      top: -6px;
+      top: -10px;
+      left: -15px;
       font-size: 20px;
       font-weight: 700;
 
@@ -175,6 +176,7 @@ p {
     &.show {
       display: block;
       width: -webkit-fill-available;
+      padding: 15px 0;
       height: fit-content;
       border: 1px solid $color-emphasis;
       border-radius: 10px;
@@ -184,9 +186,9 @@ p {
       div {
         div {
           width: -webkit-fill-available;
-
           box-sizing: border-box;
-          padding: 5px;
+          padding: 5px 30px;
+          font-size: 14px;
           &:hover {
             cursor: pointer;
             background-color: $color-css-grey;
@@ -418,3 +420,4 @@ p {
     }
   }
 }
+

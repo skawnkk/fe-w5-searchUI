@@ -13,7 +13,8 @@ export class ViewMoreManager {
    }
 
    makeTpl() {
-      for (let i = 0; i < this.range; i++) {
+      const filteredArr = this.title.filter((_,i)=>i<this.range)
+      filteredArr.forEach((v, i)=>{
          const viewMoreLi = document.createElement('li');
          viewMoreLi.className = "panel_list";
          viewMoreLi.innerHTML =
@@ -27,16 +28,14 @@ export class ViewMoreManager {
          `
          const viewMoreArea = _.$('.evt_list ul');
          viewMoreArea.insertAdjacentElement('beforeEnd', viewMoreLi);
-      }
+
+      })
    }
 
    init() {
-      (this.value === 'view_more_basic') ? this.range = 5: this.range = this.img.length;
+      //view_more_basic: 처음렌더링시 화면에 보여지는 갯수.
+      this.range = (this.value === 'view_more_basic') ? 5: this.img.length;
       this.makeTpl();
    }
-
-
-
-
-
+}
 }
