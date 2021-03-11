@@ -38,4 +38,3 @@ export class ViewMoreManager {
       this.makeTpl();
    }
 }
-}

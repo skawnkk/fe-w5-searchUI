@@ -2,7 +2,7 @@ import {
    _
 } from "./util.js";
 import {
-   searchInit
+   SearchUI
 } from "./search_window.js";
 
 import {
@@ -67,7 +67,7 @@ function init() {
    playCarousel_hot();
    ctrlCarouselBtn();
    ctrlCarouselBtn_hot();
-   searchInit();
+   new SearchUI();
 }
 
 init();

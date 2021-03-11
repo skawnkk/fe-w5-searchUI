@@ -1,3 +1,4 @@
+
 @import "./reset.css";
 @import "./carousel.scss";
 @import "./icon.scss";
@@ -18,7 +19,11 @@ $color-transparent: #22222200;
 }
 
 .off {
-  display: none;
+  display: none !important;
+}
+
+.emphasis {
+  border: 1px solid $color-emphasis !important;
 }
 
 body {
@@ -124,47 +129,40 @@ p {
       top: 25px;
       right: 10px;
     }
-
-    &.show {
-      border: 1px solid $color-emphasis;
-    }
   }
 
   .hot_keyword_tpl {
-    display: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 20% 80%;
+    width: -webkit-fill-available;
+    border: 1px solid $color-emphasis;
+    border-radius: 10px;
+    background-color: $color-background-white;
+    position: absolute;
+    z-index: 9999;
+    padding: 30px;
 
-    &.show {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 10% 90%;
-      width: -webkit-fill-available;
-      height: 200px;
-      border: 1px solid $color-emphasis;
-      border-radius: 10px;
-      background-color: $color-background-white;
-      position: absolute;
-      z-index: 9999;
-      padding: 30px;
+    & > div:first-child {
+      color: $color-text-grey;
+      font-weight: 700;
+      grid-column: 1/3;
+    }
 
-      & > div:first-child {
-        color: $color-text-grey;
-        font-weight: 700;
-        grid-column: 1/3;
-        padding-top: 0;
-        padding-bottom: 10px;
-      }
+    & > div {
+      padding-top: 15px;
+    }
 
+    div {
       div {
-        padding: 10px 0;
-        div {
-          a {
-            font-size: 14px;
-            font-weight: 400;
-            span:nth-child(1) {
-              font-weight: 800;
-              margin-right: 10px;
-              font-style: italic;
-            }
+        padding-bottom: 15px;
+        ul {
+          font-size: 14px;
+          font-weight: 400;
+          span:nth-child(1) {
+            font-weight: 800;
+            margin-right: 10px;
+            font-style: italic;
           }
         }
       }
@@ -172,28 +170,24 @@ p {
   }
 
   .related_term_tpl {
-    display: none;
-    &.show {
-      display: block;
+    display: block;
+    width: -webkit-fill-available;
+    padding: 15px 0;
+    height: fit-content;
+    border: 1px solid $color-emphasis;
+    border-radius: 10px;
+    background-color: $color-background-white;
+    position: absolute;
+    z-index: 9999;
+
+    div {
       width: -webkit-fill-available;
-      padding: 15px 0;
-      height: fit-content;
-      border: 1px solid $color-emphasis;
-      border-radius: 10px;
-      background-color: $color-background-white;
-      position: absolute;
-      z-index: 9999;
-      div {
-        div {
-          width: -webkit-fill-available;
-          box-sizing: border-box;
-          padding: 5px 30px;
-          font-size: 14px;
-          &:hover {
-            cursor: pointer;
-            background-color: $color-css-grey;
-          }
-        }
+      box-sizing: border-box;
+      padding: 5px 30px;
+      font-size: 14px;
+      &:hover {
+        cursor: pointer;
+        background-color: $color-css-grey;
       }
     }
   }
@@ -420,4 +414,3 @@ p {
     }
   }
 }
-
