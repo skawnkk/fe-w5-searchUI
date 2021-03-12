@@ -36,6 +36,9 @@ SearchUI.prototype.renderRollingKeyword = function(){
    this.rollupKeyword();
 }
 
+SearchUI.prototype.rollupKeyword= function(){
+   this.checkSetTimeout();
+}
 
 SearchUI.prototype.checkSetTimeout = function(){
    (this.clicked!==true)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
@@ -52,10 +55,6 @@ SearchUI.prototype.moveNode = function(){
       this.rollingPage.style.transform ='translateY(0px)';
    },1000)
 
-   this.checkSetTimeout();
-}
-
-SearchUI.prototype.rollupKeyword= function(){
    this.checkSetTimeout();
 }
 
