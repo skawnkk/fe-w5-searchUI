@@ -11,6 +11,7 @@ export function SearchUI(){
    this.rollingPage;
    this.relatedTermBox= _.$('.related_term_tpl');
    this.init();
+   this.clicked=false;
 }
 
 SearchUI.prototype.init = function(){
@@ -21,8 +22,8 @@ SearchUI.prototype.init = function(){
 
 SearchUI.prototype.getInitialData = async function(){
    const url = 'https://shoppinghow.kakao.com/v1.0/shophow/top/recomKeyword.json?_=1615192416887';
-   const initialData = await getData(url);
-   this.popularSearchTerm = initialData.list.map(el=>el.keyword);
+   const {list} = await getData(url);
+   this.popularSearchTerm = list.map(el=>el.keyword).slice(0,10);
   
    this.renderRollingKeyword();
    this.renderKeywordBox();
@@ -35,17 +36,51 @@ SearchUI.prototype.renderRollingKeyword = function(){
    this.rollupKeyword();
 }
 
+
+SearchUI.prototype.checkSetTimeout = function(){
+   (this.clicked!==true)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
+}
+
+SearchUI.prototype.moveNode = function(){
+   this.rollingPage.style.transition = '1s';
+   this.rollingPage.style.transform =`translateY(-50px)`;
+
+   setTimeout(() => {
+      const first = this.rollingPage.firstElementChild;
+      this.rollingPage.appendChild(first);
+      this.rollingPage.style.transition ='none';
+      this.rollingPage.style.transform ='translateY(0px)';
+   },1000)
+
+   this.checkSetTimeout();
+}
+
 SearchUI.prototype.rollupKeyword= function(){
-   setInterval(()=>{
-      this.rollingPage.style.transition = '1s';
-      this.rollingPage.style.transform =`translateY(-50px)`;
-     setTimeout(() => {
-         const first = this.rollingPage.firstElementChild;
-         this.rollingPage.appendChild(first);
-         this.rollingPage.style.transition ='none';
-         this.rollingPage.style.transform ='translateY(0px)';
-      },1000)
-   }, 2500)
+   this.checkSetTimeout();
+}
+
+SearchUI.prototype.controllMouseEvent = function(){
+   const clickArea = this.searchBox.firstElementChild.closest('.search_box');
+   
+   clickArea.addEventListener('click',()=>{
+      hideTarget(this.rollingPage);
+      emphasisOn(this.searchBox);
+      (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
+      this.clicked =true;
+      this.rollupKeyword();
+   })
+
+   this.searchArea.addEventListener("mouseleave", ()=>setTimeout(()=>{
+      if(this.searchWindow.value==='') {
+         showTarget(this.rollingPage);
+         this.clicked = false;
+         this.rollupKeyword();
+      } 
+      hideTarget(this.relatedTermBox);
+      hideTarget(this.hotKeywordBox);
+      emphasisOff(this.searchBox);
+     
+   }, 200));
 }
 
 SearchUI.prototype.renderKeywordBox= function(){
@@ -55,24 +90,6 @@ SearchUI.prototype.renderKeywordBox= function(){
  
    this.makeTpl(halfArr, 1, this.hotKeywordBox,'beforeEnd');
    this.makeTpl(halfArr, 6,  this.hotKeywordBox, 'beforeEnd');
-}
-
-SearchUI.prototype.controllMouseEvent = function(){
-   const clickArea = this.searchBox.firstElementChild.closest('.search_box');
-   clickArea.addEventListener('click',()=>{
-      hideTarget(this.rollingPage);
-      emphasisOn(this.searchBox);
-      (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
-   })
-
-   this.searchArea.addEventListener("mouseleave", ()=>setTimeout(()=>{
-      if(this.searchWindow.value==='') {
-         showTarget(this.rollingPage);
-      } 
-      hideTarget(this.relatedTermBox);
-      hideTarget(this.hotKeywordBox);
-      emphasisOff(this.searchBox);
-   }, 200));
 }
 
 SearchUI.prototype.realtimeSearch = function(){
@@ -111,18 +128,6 @@ SearchUI.prototype.renderRelatedTerm = function(resArray, inputTerm){
 SearchUI.prototype.colorMatchingStr = function(el, inputTerm){
    const matchingOption = new RegExp(inputTerm);
    return el.replace(matchingOption.exec(el),`<span class="emphasis_text">${matchingOption.exec(el)}</span>`);
-   const elToArr = Array.prototype.slice.call(el);
-   const inputTermLength = Array.prototype.slice.call(this.searchWindow.value).length;
-   elToArr.forEach((v,i)=>{
-      if(i<inputTermLength) {v.style.color = 'rgb(255, 0,0)';}})
-   //const inputTermLength = this.searchWindow.value.length;
-  
-
-   console.log(elToArr, inputTermLength)
-
-
-   console.log(el, matchingOption, matchingOption.exec(el), this.searchWindow.value)
-   //검색어와 일치하는 단어 색을 바꾸는 작업인데 아직 어떻게할지 아이디어가없습니다//
 }
 
 SearchUI.prototype.makeTpl = function(arr, startNumber, pasteArea, place){
