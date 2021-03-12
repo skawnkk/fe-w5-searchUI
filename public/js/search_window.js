@@ -17,7 +17,6 @@ export function SearchUI(){
 
 SearchUI.prototype.init = function(){
    this.getInitialData();
-   this.controllMouseEvent();
    this.realtimeSearch();
    this.eventControll();
 }
@@ -31,13 +30,40 @@ SearchUI.prototype.getInitialData = async function(){
    this.renderKeywordBox();
 }
 
+SearchUI.prototype.eventControll = function(){
+   this.controllMouseEvent();
+   this.searchWindow.addEventListener('keydown', ({key})=>this.controllKeyEvent(key));
+}
+
+SearchUI.prototype.controllMouseEvent = function(){
+   const clickArea = this.searchBox.firstElementChild.closest('.search_box');
+   clickArea.addEventListener('click',()=>{
+      hideTarget(this.rollingPage);
+      emphasisOn(this.searchBox);
+      (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
+      this.clicked =true;
+      this.rollupKeyword();
+   })
+
+   this.searchArea.addEventListener("mouseleave", ()=>setTimeout(()=>{
+      if(this.searchWindow.value==='') {
+         showTarget(this.rollingPage);
+         this.clicked = false;
+         this.rollupKeyword();
+      } 
+      //hideTarget(this.relatedTermBox);
+      hideTarget(this.hotKeywordBox);
+      emphasisOff(this.searchBox);
+     
+   }, 200));
+}
+
 SearchUI.prototype.renderRollingKeyword = function(){
    this.makeTpl(this.popularSearchTerm, 1, this.searchWindow, 'beforeBegin');
    this.searchBox.firstElementChild.className="rolling_keyword";
    this.rollingPage = _.$('.rolling_keyword');
    this.rollupKeyword();
 }
-
 
 SearchUI.prototype.checkSetTimeout = function(){
    (this.clicked!==true)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
@@ -61,32 +87,6 @@ SearchUI.prototype.moveNode = function(){
    this.checkSetTimeout();
 }
 
-
-
-SearchUI.prototype.controllMouseEvent = function(){
-   const clickArea = this.searchBox.firstElementChild.closest('.search_box');
-   
-   clickArea.addEventListener('click',()=>{
-      hideTarget(this.rollingPage);
-      emphasisOn(this.searchBox);
-      (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
-      this.clicked =true;
-      this.rollupKeyword();
-   })
-
-   this.searchArea.addEventListener("mouseleave", ()=>setTimeout(()=>{
-      if(this.searchWindow.value==='') {
-         showTarget(this.rollingPage);
-         this.clicked = false;
-         this.rollupKeyword();
-      } 
-      //hideTarget(this.relatedTermBox);
-      hideTarget(this.hotKeywordBox);
-      emphasisOff(this.searchBox);
-     
-   }, 200));
-}
-
 SearchUI.prototype.renderKeywordBox= function(){
    const tempTitle = `<div>인기 쇼핑 키워드</div>`;
    this.hotKeywordBox.insertAdjacentHTML('afterBegin', tempTitle);
@@ -94,7 +94,6 @@ SearchUI.prototype.renderKeywordBox= function(){
  
    this.makeTpl(halfArr, 1, this.hotKeywordBox,'beforeEnd');
    this.makeTpl(halfArr, 6,  this.hotKeywordBox, 'beforeEnd');
-
 }
 
 SearchUI.prototype.realtimeSearch = function(){
@@ -147,9 +146,6 @@ SearchUI.prototype.makeTpl = function(arr, startNumber, pasteArea, place){
       tempBox.insertAdjacentHTML('beforeEnd', tempDiv)
    });
    pasteArea.insertAdjacentElement(place, tempBox);
-}
-SearchUI.prototype.eventControll = function(){
-   this.searchWindow.addEventListener('keydown', ({key})=>this.controllKeyEvent(key));
 }
 
 SearchUI.prototype.controllKeyEvent = function(key){
