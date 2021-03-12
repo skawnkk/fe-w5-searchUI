@@ -59,6 +59,8 @@ const ctrlViewMoreBtn = () => {
    viewMoreBtn.addEventListener('click', viewMoreUrlSetting)
 }
 
+const searchUI = new SearchUI;
+
 function init() {
    playViewMore();
    loadBannerImg();
@@ -67,7 +69,7 @@ function init() {
    playCarousel_hot();
    ctrlCarouselBtn();
    ctrlCarouselBtn_hot();
-   new SearchUI();
+   searchUI.init();
 }
 
 init();

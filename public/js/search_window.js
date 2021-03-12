@@ -9,15 +9,17 @@ export function SearchUI(){
    this.hotKeywordBox=_.$('.hot_keyword_tpl');
    this.popularSearchTerm;
    this.rollingPage;
+   this.relatedTermArr;
    this.relatedTermBox= _.$('.related_term_tpl');
-   this.init();
    this.clicked=false;
+   this.arrNumber = -1;
 }
 
 SearchUI.prototype.init = function(){
    this.getInitialData();
    this.controllMouseEvent();
    this.realtimeSearch();
+   this.eventControll();
 }
 
 SearchUI.prototype.getInitialData = async function(){
@@ -36,12 +38,13 @@ SearchUI.prototype.renderRollingKeyword = function(){
    this.rollupKeyword();
 }
 
-SearchUI.prototype.rollupKeyword= function(){
-   this.checkSetTimeout();
-}
 
 SearchUI.prototype.checkSetTimeout = function(){
    (this.clicked!==true)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
+}
+
+SearchUI.prototype.rollupKeyword= function(){
+   this.checkSetTimeout();
 }
 
 SearchUI.prototype.moveNode = function(){
@@ -57,6 +60,8 @@ SearchUI.prototype.moveNode = function(){
 
    this.checkSetTimeout();
 }
+
+
 
 SearchUI.prototype.controllMouseEvent = function(){
    const clickArea = this.searchBox.firstElementChild.closest('.search_box');
@@ -75,7 +80,7 @@ SearchUI.prototype.controllMouseEvent = function(){
          this.clicked = false;
          this.rollupKeyword();
       } 
-      hideTarget(this.relatedTermBox);
+      //hideTarget(this.relatedTermBox);
       hideTarget(this.hotKeywordBox);
       emphasisOff(this.searchBox);
      
@@ -89,11 +94,12 @@ SearchUI.prototype.renderKeywordBox= function(){
  
    this.makeTpl(halfArr, 1, this.hotKeywordBox,'beforeEnd');
    this.makeTpl(halfArr, 6,  this.hotKeywordBox, 'beforeEnd');
+
 }
 
 SearchUI.prototype.realtimeSearch = function(){
    let timer;
-   this.searchWindow.addEventListener('input', ()=>{
+   this.searchWindow.addEventListener('input', (e)=>{
 
       if (timer)  clearTimeout(timer);
       timer = setTimeout(async ()=>{
@@ -105,8 +111,8 @@ SearchUI.prototype.realtimeSearch = function(){
          }
          const relatedLink = `https://completion.amazon.com/api/2017/suggestions?mid=ATVPDKIKX0DER&alias=aps&suggestion-type=KEYWORD&prefix=${searchingWord}`;
          const {suggestions, prefix} = await getData(relatedLink);
-         const relatedTermArr = suggestions.map(el=>el.value)
-         this.renderRelatedTerm(relatedTermArr, prefix);
+         this.relatedTermArr = suggestions.map(el=>el.value)
+         this.renderRelatedTerm(this.relatedTermArr, prefix);
         }, 500);
    })
 }
@@ -122,6 +128,7 @@ SearchUI.prototype.renderRelatedTerm = function(resArray, inputTerm){
    });
    showTarget(this.relatedTermBox);
    hideTarget(this.hotKeywordBox);
+   this.controllKeyEvent();
 }
 
 SearchUI.prototype.colorMatchingStr = function(el, inputTerm){
@@ -140,4 +147,46 @@ SearchUI.prototype.makeTpl = function(arr, startNumber, pasteArea, place){
       tempBox.insertAdjacentHTML('beforeEnd', tempDiv)
    });
    pasteArea.insertAdjacentElement(place, tempBox);
+}
+SearchUI.prototype.eventControll = function(){
+   this.searchWindow.addEventListener('keydown', ({key})=>this.controllKeyEvent(key));
+}
+
+SearchUI.prototype.controllKeyEvent = function(key){
+   if(key!=='ArrowDown'&&key!=='ArrowUp'&&key!=='Escape') return;
+   const reltermDivs = Array.from(this.relatedTermBox.children);
+   if(reltermDivs.length===0) return; //연관검색어가 존재하지 않는 경우
+
+   switch (key) {
+      case 'ArrowUp':
+         this.arrNumber-=1;
+         break;
+      case 'ArrowDown':
+         if(this.arrNumber<0) showTarget(this.relatedTermBox);
+         this.arrNumber+=1;
+         break;
+      default:
+         hideTarget(this.relatedTermBox);
+         this.arrNumber = -1;
+         return;
+   }  
+
+   if(this.arrNumber>reltermDivs.length-1 || this.arrNumber<0) {
+      hideTarget(this.relatedTermBox);
+      this.arrNumber = -1;
+      return;
+   }
+
+   reltermDivs.forEach(el=>{
+      if(el.classList.contains('keybord_focus')){
+         console.log(this.arrNumber)
+         el.classList.remove('keybord_focus')
+      };
+   });
+
+   reltermDivs[this.arrNumber].classList.add('keybord_focus');
+
+   const focusedKey = _.$('.keybord_focus');
+   console.log(focusedKey.innerText, this.searchWindow)
+   this.searchWindow.value = focusedKey.innerText;
 }
