@@ -88,19 +88,19 @@ SearchUI.prototype.realtimeSearch = function(){
             return;
          }
          const relatedLink = `https://completion.amazon.com/api/2017/suggestions?mid=ATVPDKIKX0DER&alias=aps&suggestion-type=KEYWORD&prefix=${searchingWord}`;
-         const relatedTermData = await getData(relatedLink);
-         const relatedTermArr = relatedTermData.suggestions.map(el=>el.value)
-         this.renderRelatedTerm(relatedTermArr);
+         const {suggestions, prefix} = await getData(relatedLink);
+         const relatedTermArr = suggestions.map(el=>el.value)
+         this.renderRelatedTerm(relatedTermArr, prefix);
         }, 500);
    })
 }
 
-SearchUI.prototype.renderRelatedTerm = function(resArray){
+SearchUI.prototype.renderRelatedTerm = function(resArray, inputTerm){
    while(this.relatedTermBox.firstChild) {
       this.relatedTermBox.removeChild(this.relatedTermBox.firstChild); 
    }
    resArray.forEach(el=> {
-      this.colorMatchingStr(el);
+      el = this.colorMatchingStr(el, inputTerm);
       const divEl = `<div>${el}</div>`;
       this.relatedTermBox.insertAdjacentHTML('beforeEnd', divEl);
    });
@@ -108,8 +108,19 @@ SearchUI.prototype.renderRelatedTerm = function(resArray){
    hideTarget(this.hotKeywordBox);
 }
 
-SearchUI.prototype.colorMatchingStr = function(el){
-   const matchingOption = new RegExp(this.searchWindow.value);
+SearchUI.prototype.colorMatchingStr = function(el, inputTerm){
+   const matchingOption = new RegExp(inputTerm);
+   return el.replace(matchingOption.exec(el),`<span class="emphasis_text">${matchingOption.exec(el)}</span>`);
+   const elToArr = Array.prototype.slice.call(el);
+   const inputTermLength = Array.prototype.slice.call(this.searchWindow.value).length;
+   elToArr.forEach((v,i)=>{
+      if(i<inputTermLength) {v.style.color = 'rgb(255, 0,0)';}})
+   //const inputTermLength = this.searchWindow.value.length;
+  
+
+   console.log(elToArr, inputTermLength)
+
+
    console.log(el, matchingOption, matchingOption.exec(el), this.searchWindow.value)
    //검색어와 일치하는 단어 색을 바꾸는 작업인데 아직 어떻게할지 아이디어가없습니다//
 }
@@ -125,5 +136,4 @@ SearchUI.prototype.makeTpl = function(arr, startNumber, pasteArea, place){
       tempBox.insertAdjacentHTML('beforeEnd', tempDiv)
    });
    pasteArea.insertAdjacentElement(place, tempBox);
-}
 }

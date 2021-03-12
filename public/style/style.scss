@@ -26,6 +26,10 @@ $color-transparent: #22222200;
   border: 1px solid $color-emphasis !important;
 }
 
+.emphasis_text {
+  color: $color-emphasis;
+}
+
 body {
   background-color: $color-background-beige;
   font-family: "Nanum Gothic", sans-serif;

@@ -31,6 +31,9 @@
 .emphasis {
   border: 1px solid #f9624c !important; }
 
+.emphasis_text {
+  color: #f9624c; }
+
 body {
   background-color: #f3f3f3;
   font-family: "Nanum Gothic", sans-serif;
