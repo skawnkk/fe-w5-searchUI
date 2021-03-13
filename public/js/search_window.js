@@ -9,7 +9,7 @@ export function SearchUI(){
    this.searchForm = _.$('.search_form');  
    this.hotKeywordBox=_.$('.hot_keyword_tpl');
    this.relatedTermBox= _.$('.related_term_tpl');
-   this.searchedKeywordBox= _.$('.searched_keyword_tpl');
+   this.searchedKeywordBox = _.$('.searched_keyword_tpl');
    this.rollingPage;
    this.popularSearchTerm;
    this.relatedTermArr;
@@ -17,6 +17,7 @@ export function SearchUI(){
    this.arrNumber = -1;
    this.dataKey ='recentSearchTerms';
    this.dataArr = [];
+   this.loadedDataArr;
    this.delBtn=_.$('.delete');
 }
 
@@ -24,6 +25,7 @@ SearchUI.prototype.init = function(){
    this.getInitialData();
    this.realtimeSearch();
    this.eventControll();
+   this.loadSearchTerm();
 }
 
 SearchUI.prototype.getInitialData = async function(){
@@ -33,7 +35,7 @@ SearchUI.prototype.getInitialData = async function(){
   
    this.renderRollingKeyword();
    this.renderKeywordBox();
-   this.renderSearchTerm();
+   
 }
 
 SearchUI.prototype.eventControll = function(){
@@ -41,19 +43,21 @@ SearchUI.prototype.eventControll = function(){
    this.searchWindow.addEventListener('keydown', ({key})=>this.controllKeyEvent(key));
    this.searchForm.addEventListener('submit', (evt)=>{
       evt.preventDefault()
+
       const submittedData = {
          term: this.searchWindow.value,
          id: evt.timeStamp
       }
-      if(this.dataArr.length>=5) this.dataArr.pop();
-      this.dataArr.unshift(submittedData);
-      this.storeSearchTerm();
-      history.go(0);
-   });
-}
+      
+      if(this.dataArr>5) this.dataArr.shift();
+      this.dataArr.push(submittedData);
+      this.pasteSearchedTerms(submittedData.term, submittedData.id);
 
-SearchUI.prototype.renderSearchTerm = function(){
-   this.loadSearchTerm();
+      this.searchWindow.value="";
+      this.searchWindow.blur();
+      hideTarget(this.hotKeywordBox);
+      hideTarget(this.relatedTermBox);
+   });
 }
 
 SearchUI.prototype.storeSearchTerm = function(){
@@ -64,51 +68,54 @@ SearchUI.prototype.loadSearchTerm = function(){
    const loadedDataObj = localStorage.getItem(this.dataKey);
 
    if(loadedDataObj!==null){
-      const loadedDataArr = JSON.parse(loadedDataObj);
-      loadedDataArr.forEach(({term, id})=>this.pasteSearchedTerms(term, id))
+      this.loadedDataArr = JSON.parse(loadedDataObj);
+      this.loadedDataArr.forEach(({term, id})=>this.pasteSearchedTerms(term, id))
    }
 }
 
 SearchUI.prototype.pasteSearchedTerms = function(term, id){
+
    const divEl =_.create('div');
    divEl.innerHTML = `<span>${term}</span>`;
    divEl.id = id;
+
    const delBtn = _.create('span');
    delBtn.className = 'delete';
    delBtn.innerText = 'ⅹ';
-   delBtn.addEventListener('click',({target})=>this.deleteSearchTerm(target))
-   divEl.appendChild(delBtn);
-   
-   this.searchedKeywordBox.insertAdjacentElement('afterBegin', divEl);
-}
+   delBtn.addEventListener('click',({target})=>this.deleteSearchTerm(target));
 
+   divEl.appendChild(delBtn);
+   this.searchedKeywordBox.insertAdjacentElement('AfterBegin', divEl);
+   this.storeSearchTerm();
+}
 
 SearchUI.prototype.deleteSearchTerm = function(target){
-   console.log(target)
-
+   
+   this.searchedKeywordBox.removeChild(target.parentNode);
+   const updatedArr =this.dataArr.filter(el=>(el.id!==target.parentNode.id));
+   this.dataArr = updatedArr;
+   this.storeSearchTerm();
 }
-
 
 SearchUI.prototype.controllMouseEvent = function(){
    const clickArea = this.searchBox.firstElementChild.closest('.search_box');
-   clickArea.addEventListener('click',({target})=>{
+   clickArea.addEventListener('click',()=>{
+      this.clicked =true;
       hideTarget(this.rollingPage);
+
       emphasisOn(this.searchBox);
       (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
-      this.clicked =true;
-      this.rollupKeyword();
    })
 
    this.searchArea.addEventListener("mouseleave", ()=>setTimeout(()=>{
       if(this.searchWindow.value==='') {
-         showTarget(this.rollingPage);
          this.clicked = false;
-         this.rollupKeyword();
-      } 
+         showTarget(this.rollingPage);
+      }
+
       hideTarget(this.relatedTermBox);
       hideTarget(this.hotKeywordBox);
       emphasisOff(this.searchBox);
-     
    }, 200));
 }
 
@@ -116,11 +123,11 @@ SearchUI.prototype.renderRollingKeyword = function(){
    this.makeTpl(this.popularSearchTerm, 1, this.searchWindow, 'beforeBegin');
    this.searchBox.firstElementChild.className="rolling_keyword";
    this.rollingPage = _.$('.rolling_keyword');
-   //this.rollupKeyword();
+   this.rollupKeyword();
 }
 
 SearchUI.prototype.checkSetTimeout = function(){
-   (this.clicked!==true)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
+   (this.clicked===false)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
 }
 
 SearchUI.prototype.rollupKeyword= function(){
@@ -229,7 +236,6 @@ SearchUI.prototype.controllKeyEvent = function(key){
 
    reltermDivs.forEach(el=>{
       if(el.classList.contains('keybord_focus')){
-         console.log(this.arrNumber)
          el.classList.remove('keybord_focus')
       };
    });

@@ -5,12 +5,19 @@
 $menu_interval: 0.5rem;
 $color-emphasis: #f9624c;
 $color-css-grey: #ebecea;
+$color-css-grey2: #e2e2e2;
 $color-text-grey: #888888;
 $color-background-beige: #f3f3f3;
 $color-background-white: #fff;
 $color-transparent-black: #222222d7;
 $color-transparent: #22222200;
 
+button {
+  color: $color-transparent;
+  box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+}
 // common
 .off {
   display: none !important;
@@ -396,9 +403,15 @@ p {
 }
 
 .see_more_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 80px;
-  border: none;
+  border: $color-css-grey;
+  font-weight: 400;
+  background-color: $color-css-grey2;
+  cursor: pointer;
 }
 
 .section_hot_deal {

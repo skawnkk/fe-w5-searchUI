@@ -1,23 +1,43 @@
-
 .basic_icon {
+  $h: 30px;
+  width: $h;
+  height: $h;
+  background: url(/img/icon.png) no-repeat;
 
-   $h: 30px;
-   width: $h;
-   height: $h;
-   background: url(/img/icon.png) no-repeat;
-
-
-   @at-root.basic_icon_3 {
-      background-position-y:-$h;
-   }
-
-   @at-root.basic_icon_4 {
-      background-position-x: -$h;
-      background-position-y: -$h;
-   }
-
-   @at-root.basic_icon_5 {
-      background-position-x: -$h*2;
-      background-position-y: -$h;
+  @at-root.basic_icon_3 {
+    background-position-y: -$h;
   }
-}  
+
+  @at-root.basic_icon_4 {
+    background-position-x: -$h;
+    background-position-y: -$h;
+  }
+
+  @at-root.basic_icon_5 {
+    background-position-x: -$h * 2;
+    background-position-y: -$h;
+  }
+}
+
+.arrow_icon {
+  height: 60px;
+  width: 30px;
+  background: url(/img/icon_btn.png) no-repeat;
+
+  @at-root.arrow_icon_1 {
+    background-position-y: 10px;
+  }
+  @at-root.arrow_icon_2 {
+    background-position-x: -24px;
+    background-position-y: 10px;
+  }
+  @at-root.arrow_icon_3 {
+    background-position-y: -45px;
+    width: 40px;
+  }
+  @at-root.arrow_icon_4 {
+    background-position-y: -45px;
+    background-position-x: -50px;
+    width: 40px;
+  }
+}
