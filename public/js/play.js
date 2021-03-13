@@ -3,7 +3,7 @@ import {
 } from "./util.js";
 import {
    SearchUI
-} from "./search_window.js";
+} from "./search.js";
 
 import {
    CarouselCtrl
