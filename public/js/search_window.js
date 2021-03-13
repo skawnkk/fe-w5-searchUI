@@ -171,7 +171,7 @@ SearchUI.prototype.realtimeSearch = function(){
          }
          const relatedLink = `https://completion.amazon.com/api/2017/suggestions?mid=ATVPDKIKX0DER&alias=aps&suggestion-type=KEYWORD&prefix=${searchingWord}`;
          const {suggestions, prefix} = await getData(relatedLink);
-         this.relatedTermArr = suggestions.map(el=>el.value)
+         this.relatedTermArr = suggestions.map(el=>el.value);
          this.renderRelatedTerm(this.relatedTermArr, prefix);
         }, 200);
    })
@@ -186,9 +186,12 @@ SearchUI.prototype.renderRelatedTerm = function(resArray, inputTerm){
       const divEl = `<div>${el}</div>`;
       this.relatedTermBox.insertAdjacentHTML('beforeEnd', divEl);
    });
+   if(this.relatedTermArr.length===0) {
+      hideTarget(this.relatedTermBox);
+      return;
+   }
    showTarget(this.relatedTermBox);
    hideTarget(this.hotKeywordBox);
-   this.controllKeyEvent();
 }
 
 SearchUI.prototype.colorMatchingStr = function(el, inputTerm){
@@ -225,19 +228,21 @@ SearchUI.prototype.controllKeyEvent = function(key){
       default:
          hideTarget(this.relatedTermBox);
          this.arrNumber = -1;
+         showTarget(this.rollingPage);
+         this.clicked = false;
          return;
    }  
 
    if(this.arrNumber>reltermDivs.length-1 || this.arrNumber<0) {
       hideTarget(this.relatedTermBox);
       this.arrNumber = -1;
+      showTarget(this.rollingPage);
+      this.clicked = false;
       return;
    }
 
    reltermDivs.forEach(el=>{
-      if(el.classList.contains('keybord_focus')){
-         el.classList.remove('keybord_focus')
-      };
+      if(el.classList.contains('keybord_focus'))el.classList.remove('keybord_focus');
    });
 
    reltermDivs[this.arrNumber].classList.add('keybord_focus');
