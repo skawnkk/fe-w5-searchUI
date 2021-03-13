@@ -6,13 +6,18 @@ export function SearchUI(){
    this.searchWindow = _.$('.search_input');   
    this.searchBox = _.$('.search_box'); 
    this.searchArea = _.$('.search');  
+   this.searchForm = _.$('.search_form');  
    this.hotKeywordBox=_.$('.hot_keyword_tpl');
-   this.popularSearchTerm;
-   this.rollingPage;
-   this.relatedTermArr;
    this.relatedTermBox= _.$('.related_term_tpl');
+   this.searchedKeywordBox= _.$('.searched_keyword_tpl');
+   this.rollingPage;
+   this.popularSearchTerm;
+   this.relatedTermArr;
    this.clicked=false;
    this.arrNumber = -1;
+   this.dataKey ='recentSearchTerms';
+   this.dataArr = [];
+   this.delBtn=_.$('.delete');
 }
 
 SearchUI.prototype.init = function(){
@@ -28,16 +33,65 @@ SearchUI.prototype.getInitialData = async function(){
   
    this.renderRollingKeyword();
    this.renderKeywordBox();
+   this.renderSearchTerm();
 }
 
 SearchUI.prototype.eventControll = function(){
    this.controllMouseEvent();
    this.searchWindow.addEventListener('keydown', ({key})=>this.controllKeyEvent(key));
+   this.searchForm.addEventListener('submit', (evt)=>{
+      evt.preventDefault()
+      const submittedData = {
+         term: this.searchWindow.value,
+         id: evt.timeStamp
+      }
+      if(this.dataArr.length>=5) this.dataArr.pop();
+      this.dataArr.unshift(submittedData);
+      this.storeSearchTerm();
+      history.go(0);
+   });
 }
+
+SearchUI.prototype.renderSearchTerm = function(){
+   this.loadSearchTerm();
+}
+
+SearchUI.prototype.storeSearchTerm = function(){
+   localStorage.setItem(this.dataKey, JSON.stringify(this.dataArr));
+}
+
+SearchUI.prototype.loadSearchTerm = function(){
+   const loadedDataObj = localStorage.getItem(this.dataKey);
+
+   if(loadedDataObj!==null){
+      const loadedDataArr = JSON.parse(loadedDataObj);
+      loadedDataArr.forEach(({term, id})=>this.pasteSearchedTerms(term, id))
+   }
+}
+
+SearchUI.prototype.pasteSearchedTerms = function(term, id){
+   const divEl =_.create('div');
+   divEl.innerHTML = `<span>${term}</span>`;
+   divEl.id = id;
+   const delBtn = _.create('span');
+   delBtn.className = 'delete';
+   delBtn.innerText = 'ⅹ';
+   delBtn.addEventListener('click',({target})=>this.deleteSearchTerm(target))
+   divEl.appendChild(delBtn);
+   
+   this.searchedKeywordBox.insertAdjacentElement('afterBegin', divEl);
+}
+
+
+SearchUI.prototype.deleteSearchTerm = function(target){
+   console.log(target)
+
+}
+
 
 SearchUI.prototype.controllMouseEvent = function(){
    const clickArea = this.searchBox.firstElementChild.closest('.search_box');
-   clickArea.addEventListener('click',()=>{
+   clickArea.addEventListener('click',({target})=>{
       hideTarget(this.rollingPage);
       emphasisOn(this.searchBox);
       (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
@@ -51,7 +105,7 @@ SearchUI.prototype.controllMouseEvent = function(){
          this.clicked = false;
          this.rollupKeyword();
       } 
-      //hideTarget(this.relatedTermBox);
+      hideTarget(this.relatedTermBox);
       hideTarget(this.hotKeywordBox);
       emphasisOff(this.searchBox);
      
@@ -62,7 +116,7 @@ SearchUI.prototype.renderRollingKeyword = function(){
    this.makeTpl(this.popularSearchTerm, 1, this.searchWindow, 'beforeBegin');
    this.searchBox.firstElementChild.className="rolling_keyword";
    this.rollingPage = _.$('.rolling_keyword');
-   this.rollupKeyword();
+   //this.rollupKeyword();
 }
 
 SearchUI.prototype.checkSetTimeout = function(){
@@ -112,7 +166,7 @@ SearchUI.prototype.realtimeSearch = function(){
          const {suggestions, prefix} = await getData(relatedLink);
          this.relatedTermArr = suggestions.map(el=>el.value)
          this.renderRelatedTerm(this.relatedTermArr, prefix);
-        }, 500);
+        }, 200);
    })
 }
 
@@ -183,6 +237,5 @@ SearchUI.prototype.controllKeyEvent = function(key){
    reltermDivs[this.arrNumber].classList.add('keybord_focus');
 
    const focusedKey = _.$('.keybord_focus');
-   console.log(focusedKey.innerText, this.searchWindow)
    this.searchWindow.value = focusedKey.innerText;
 }

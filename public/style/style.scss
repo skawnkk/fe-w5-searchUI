@@ -12,11 +12,6 @@ $color-transparent-black: #222222d7;
 $color-transparent: #22222200;
 
 // common
-
-.on {
-  display: block;
-}
-
 .off {
   display: none !important;
 }
@@ -80,6 +75,8 @@ p {
 
 .search {
   position: relative;
+  top: 10px;
+
   .search_box {
     width: 650px;
     height: 70px;
@@ -105,7 +102,6 @@ p {
           span {
             color: $color-text-grey;
           }
-
           span:nth-child(1) {
             margin-right: 10px;
           }
@@ -138,6 +134,33 @@ p {
     }
   }
 
+  .searched_keyword_tpl {
+    color: $color-transparent;
+    height: 25px;
+    display: flex;
+    div {
+      margin-top: 10px;
+      margin-left: 10px;
+      cursor: pointer;
+      display: flex;
+      span {
+        color: $color-text-grey;
+        font-size: 12px;
+        display: block;
+      }
+      span:nth-of-type(2) {
+        color: $color-transparent;
+      }
+      &:hover {
+        span:nth-of-type(2) {
+          margin-left: 3px;
+          color: $color-text-grey;
+          background-color: $color-css-grey;
+        }
+      }
+    }
+  }
+
   .hot_keyword_tpl {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -147,6 +170,7 @@ p {
     border-radius: 10px;
     background-color: $color-background-white;
     position: absolute;
+    top: 70px;
     z-index: 9999;
     padding: 30px;
 
@@ -185,6 +209,7 @@ p {
     border-radius: 10px;
     background-color: $color-background-white;
     position: absolute;
+    top: 70px;
     z-index: 9999;
 
     div {

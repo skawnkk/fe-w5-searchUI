@@ -22,9 +22,6 @@
     background-position-x: -60px;
     background-position-y: -30px; }
 
-.on {
-  display: block; }
-
 .off {
   display: none !important; }
 
@@ -72,7 +69,8 @@ p {
       width: 10vw; }
 
 .search {
-  position: relative; }
+  position: relative;
+  top: 10px; }
   .search .search_box {
     width: 650px;
     height: 70px;
@@ -116,6 +114,25 @@ p {
       position: absolute;
       top: 25px;
       right: 10px; }
+  .search .searched_keyword_tpl {
+    color: #22222200;
+    height: 25px;
+    display: flex; }
+    .search .searched_keyword_tpl div {
+      margin-top: 10px;
+      margin-left: 10px;
+      cursor: pointer;
+      display: flex; }
+      .search .searched_keyword_tpl div span {
+        color: #888888;
+        font-size: 12px;
+        display: block; }
+      .search .searched_keyword_tpl div span:nth-of-type(2) {
+        color: #22222200; }
+      .search .searched_keyword_tpl div:hover span:nth-of-type(2) {
+        margin-left: 3px;
+        color: #888888;
+        background-color: #ebecea; }
   .search .hot_keyword_tpl {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -125,6 +142,7 @@ p {
     border-radius: 10px;
     background-color: #fff;
     position: absolute;
+    top: 70px;
     z-index: 9999;
     padding: 30px; }
     .search .hot_keyword_tpl > div:first-child {
@@ -151,6 +169,7 @@ p {
     border-radius: 10px;
     background-color: #fff;
     position: absolute;
+    top: 70px;
     z-index: 9999; }
     .search .related_term_tpl div {
       width: -webkit-fill-available;
