@@ -135,10 +135,10 @@ SearchUI.prototype.controllKeyEvent = function (key) {
 
   switch (key) {
     case 'ArrowUp':
-      this.arrNumber === 0 ? (this.arrNumber = 9) : (this.arrNumber -= 1);
+      this.arrNumber === 0 ? (this.arrNumber = reltermDivs.length - 1) : (this.arrNumber -= 1);
       break;
     case 'ArrowDown':
-      this.arrNumber === 9 ? (this.arrNumber = 0) : (this.arrNumber += 1);
+      this.arrNumber === reltermDivs.length - 1 ? (this.arrNumber = 0) : (this.arrNumber += 1);
       break;
     default:
       this.turnOffRelatedKeyword();
