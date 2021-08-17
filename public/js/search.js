@@ -55,24 +55,26 @@ SearchUI.prototype.deleteSearchTerm = function (target) {
   this.storeSearchTerm(this.searchHistory);
 };
 
+SearchUI.prototype.handleSearchSubmit = function (evt) {
+  evt.preventDefault();
+  const submittedKeyword = {
+    term: this.searchWindow.value,
+    id: evt.timeStamp,
+  };
+
+  if (this.searchHistory.length > 5) this.searchHistory.shift();
+  this.searchHistory.push(submittedKeyword);
+  this.storeSearchTerm(this.searchHistory);
+
+  this.searchWindow.value = '';
+  this.searchWindow.blur();
+  hideTarget(this.hotKeywordBox);
+  hideTarget(this.relatedTermBox);
+};
+
 SearchUI.prototype.controllKeybordEvent = function () {
   this.searchWindow.addEventListener('keydown', ({ key }) => this.controllKeyEvent(key));
-  this.searchForm.addEventListener('submit', (evt) => {
-    evt.preventDefault();
-    const submittedKeyword = {
-      term: this.searchWindow.value,
-      id: evt.timeStamp,
-    };
-
-    if (this.searchHistory.length > 5) this.searchHistory.shift();
-    this.searchHistory.push(submittedKeyword);
-    this.storeSearchTerm(this.searchHistory);
-
-    this.searchWindow.value = '';
-    this.searchWindow.blur();
-    hideTarget(this.hotKeywordBox);
-    hideTarget(this.relatedTermBox);
-  });
+  this.searchForm.addEventListener('submit', this.handleSearchSubmit);
 };
 
 //🍒 검색창입력 - 연관검색어
@@ -118,10 +120,17 @@ SearchUI.prototype.turnOffRelatedKeyword = function () {
   return;
 };
 
+SearchUI.prototype.focuseTargetItem = function (reltermDivs) {
+  reltermDivs.forEach((el) => {
+    if (el.classList.contains('keybord_focus')) el.classList.remove('keybord_focus');
+  });
+  reltermDivs[this.arrNumber].classList.add('keybord_focus');
+  this.searchWindow.value = _.$('.keybord_focus').innerText;
+};
+
 SearchUI.prototype.controllKeyEvent = function (key) {
   if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Escape') return;
   const reltermDivs = Array.from(this.relatedTermBox.children);
-
   if (reltermDivs.length === 0) return; //연관검색어가 존재하지 않는 경우
 
   switch (key) {
@@ -134,19 +143,7 @@ SearchUI.prototype.controllKeyEvent = function (key) {
     default:
       this.turnOffRelatedKeyword();
   }
-
-  if (this.arrNumber > reltermDivs.length - 1 || this.arrNumber < 0) {
-    return this.turnOffRelatedKeyword.bind(this);
-  }
-
-  reltermDivs.forEach((el) => {
-    if (el.classList.contains('keybord_focus')) el.classList.remove('keybord_focus');
-  });
-
-  reltermDivs[this.arrNumber].classList.add('keybord_focus');
-
-  const focusedKey = _.$('.keybord_focus');
-  this.searchWindow.value = focusedKey.innerText;
+  this.focuseTargetItem(reltermDivs);
 };
 
 SearchUI.prototype.init = function () {
