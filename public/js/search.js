@@ -109,34 +109,36 @@ SearchUI.prototype.renderRelatedTerm = function (relatedKeyword, inputTerm) {
   hideTarget(this.hotKeywordBox);
 };
 
+SearchUI.prototype.turnOffRelatedKeyword = function () {
+  console.log(5);
+  hideTarget(this.relatedTermBox);
+  showTarget(_.$('.rolling_keyword'));
+  this.searchWindow.value = '';
+  this.searchWindow.blur();
+  this.arrNumber = -1;
+  // this.clicked = false;
+  return;
+};
+
 SearchUI.prototype.controllKeyEvent = function (key) {
   if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Escape') return;
-
-  const turnOffRelatedKeyword = () => {
-    hideTarget(this.relatedTermBox);
-    showTarget(this.rollingPage);
-    this.arrNumber = -1;
-    this.clicked = false;
-    return;
-  };
-
   const reltermDivs = Array.from(this.relatedTermBox.children);
+
   if (reltermDivs.length === 0) return; //연관검색어가 존재하지 않는 경우
 
   switch (key) {
     case 'ArrowUp':
-      this.arrNumber -= 1;
+      this.arrNumber === 0 ? (this.arrNumber = 9) : (this.arrNumber -= 1);
       break;
     case 'ArrowDown':
-      if (this.arrNumber < 0) showTarget(this.relatedTermBox);
-      this.arrNumber += 1;
+      this.arrNumber === 9 ? (this.arrNumber = 0) : (this.arrNumber += 1);
       break;
     default:
-      turnOffRelatedKeyword();
+      this.turnOffRelatedKeyword();
   }
 
   if (this.arrNumber > reltermDivs.length - 1 || this.arrNumber < 0) {
-    return turnOffRelatedKeyword();
+    return this.turnOffRelatedKeyword.bind(this);
   }
 
   reltermDivs.forEach((el) => {
