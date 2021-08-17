@@ -1,4 +1,4 @@
-import { _ } from './util.js';
+import { _ } from './util/util.js';
 import { SearchUI } from './search.js';
 import { CarouselCtroller } from './carousel.ctrl.js';
 import { RequestData } from './request_data.js';

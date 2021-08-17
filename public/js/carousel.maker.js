@@ -1,4 +1,4 @@
-import { _ } from './util.js';
+import { _ } from './util/util.js';
 
 export class CarouselMaker {
   constructor(titleArr, descArr, imgUrlArr, id) {

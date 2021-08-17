@@ -1,4 +1,4 @@
-import { _ } from './util.js';
+import { _ } from './util/util.js';
 
 export class CarouselCtroller {
   constructor(obj) {
@@ -21,7 +21,6 @@ export class CarouselCtroller {
   }
 
   play() {
-    console.log(1);
     this.picNumber = 1;
     this.area.style.transform = `translate(${-this.size * this.picNumber}px)`;
     const prevNextBtn = [this.prev, this.next];

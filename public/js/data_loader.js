@@ -1,4 +1,4 @@
-import { _ } from './util.js';
+import { _ } from './util/util.js';
 
 import { CarouselMaker } from './carousel.maker.js';
 import { BannerImgMaker } from './banner_img.js';
@@ -63,14 +63,3 @@ export class LoaderFromJson {
       .then((result) => this.populateUI(result));
   }
 }
-
-//*XMLHttpRequest
-// let requestURL = 'https://shoppinghow.kakao.com/v1.0/shophow/top/planningEvent.json?_=1614126791478';
-// let request = new XMLHttpRequest();
-// request.open('GET', requestURL);
-// request.responseType = 'json';
-// request.send();
-// request.onload = function () {
-//    let mallEventjson = request.response;
-//    dataParsing(mallEventjson.mallEventList);
-// }
