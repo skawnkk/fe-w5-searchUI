@@ -35,30 +35,9 @@ const colorMatchingSameKeyword = (el, inputTerm) => {
   );
 };
 
-//🍒검색창입력 - 검색이력Tpl
-const makeKeywordHistoryTpl = (term, id) => {
-  const divEl = _.create('div');
-  divEl.innerHTML = `<span id=${id}>${term}</span>`;
-
-  const delBtn = _.create('span');
-  delBtn.className = 'delete';
-  delBtn.innerText = 'ⅹ';
-  delBtn.addEventListener('click', ({ target }) => {
-    SearchUI.prototype.deleteSearchTerm(target);
-  });
-
-  divEl.appendChild(delBtn);
-  return divEl;
-};
-
-const validHistoryKeyword = (dataKey = 'recentSearchTerms') => {
+const validHistoryKeyword = (dataKey = 'recentSearchTerm') => {
   const loadedDataObj = localStorage.getItem(dataKey);
   return !loadedDataObj ? [] : JSON.parse(loadedDataObj);
 };
 
-export {
-  makeKeywordHistoryTpl,
-  validHistoryKeyword,
-  makeEmphasisOnTpl,
-  makeHotKeywordTpl,
-};
+export { validHistoryKeyword, makeEmphasisOnTpl, makeHotKeywordTpl };

@@ -1,5 +1,6 @@
 import { _ } from './util/util.js';
 import { SearchUI } from './search.js';
+import { HotSearchKeywordUI } from './search.hot.js';
 import { CarouselCtroller } from './carousel.ctrl.js';
 import { RequestData } from './request_data.js';
 import { URL } from './url.js';
@@ -12,22 +13,13 @@ const requestInfoForSection1_banner = 'event';
 let count = 0;
 
 const playViewMore = () =>
-  new RequestData(
-    VIEW_MORE_API,
-    requestInfoForSection2_view_more,
-    'view_more_basic'
-  );
+  new RequestData(VIEW_MORE_API, requestInfoForSection2_view_more, 'view_more_basic');
 const playHotDealCarousel = () =>
-  new RequestData(
-    CAROUSEL_API,
-    requestInfoForSection1_carousel_hot,
-    'carousel_hot'
-  );
+  new RequestData(CAROUSEL_API, requestInfoForSection1_carousel_hot, 'carousel_hot');
 const playCarousel = () =>
   new RequestData(CAROUSEL_API, requestInfoForSection1_carousel, 'carousel');
 
-const loadBannerImg = () =>
-  new RequestData(CAROUSEL_API, requestInfoForSection1_banner, 'banner');
+const loadBannerImg = () => new RequestData(CAROUSEL_API, requestInfoForSection1_banner, 'banner');
 
 const ctrlCarouselBtn = () => {
   const carouselObj = {
@@ -54,11 +46,7 @@ const viewMoreUrlSetting = () => {
     count++;
     let viewMoreUrl = VIEW_MORE_API_CUSTOM(count);
 
-    return new RequestData(
-      viewMoreUrl,
-      requestInfoForSection2_view_more,
-      'view_more'
-    );
+    return new RequestData(viewMoreUrl, requestInfoForSection2_view_more, 'view_more');
   }
 };
 
@@ -75,7 +63,8 @@ function init() {
   ctrlCarouselBtn();
   playHotDealCarousel();
   ctrlHotDealCarousel();
-  new SearchUI().init();
+  new HotSearchKeywordUI();
+  new SearchUI();
 }
 
 init();
