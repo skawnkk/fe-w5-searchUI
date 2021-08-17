@@ -12,7 +12,6 @@ export function SearchUI() {
   this.historyKeywordBox = _.$('.searched_keyword_tpl');
   this.delBtn = _.$('.delete');
   this.dataKey = 'recentSearchTerms';
-  this.clicked = false;
   this.arrNumber = -1;
   this.searchHistory = [];
   this.relatedTermArr;
@@ -110,13 +109,12 @@ SearchUI.prototype.renderRelatedTerm = function (relatedKeyword, inputTerm) {
 };
 
 SearchUI.prototype.turnOffRelatedKeyword = function () {
-  console.log(5);
   hideTarget(this.relatedTermBox);
   showTarget(_.$('.rolling_keyword'));
   this.searchWindow.value = '';
   this.searchWindow.blur();
   this.arrNumber = -1;
-  // this.clicked = false;
+
   return;
 };
 

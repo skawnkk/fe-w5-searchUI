@@ -17,7 +17,6 @@ export function HotSearchKeywordUI() {
   this.relatedTermBox = _.$('.related_term_tpl');
   this.searchArea = _.$('.search');
   this.rollingPage;
-  this.clicked = false;
   this.getHotKeyword();
 }
 
@@ -45,30 +44,28 @@ HotSearchKeywordUI.prototype.renderRollingKeyword = function (popularSearchTerm)
 };
 
 HotSearchKeywordUI.prototype.rollupKeyword = function () {
-  this.clicked === false ? setTimeout(this.moveNode.bind(this), 2000) : clearTimeout(this.moveNode);
+  setInterval(this.moveNode.bind(this), 3000);
 };
 
 HotSearchKeywordUI.prototype.moveNode = function () {
-  this.rollingPage.style.transition = '1s';
+  this.rollingPage.style.transition = '1.5s';
   this.rollingPage.style.transform = `translateY(-50px)`;
-  delay(1000).then(() => {
+  delay(1500).then(() => {
     //1초동안 translate하는 중
     const first = this.rollingPage.firstElementChild;
     this.rollingPage.appendChild(first);
     this.rollingPage.style.transition = 'none';
     this.rollingPage.style.transform = 'translateY(0px)';
   });
-
-  this.rollupKeyword();
 };
 
 HotSearchKeywordUI.prototype.handleMouseOutFromSearchUI = function () {
   delay(500).then(() => {
     if (this.searchWindow.value === '') {
-      this.clicked = false;
       showTarget(this.rollingPage);
     }
 
+    this.searchWindow.blur();
     hideTarget(this.relatedTermBox);
     hideTarget(this.hotKeywordBox);
     emphasisOff(this.searchBox);
@@ -76,11 +73,11 @@ HotSearchKeywordUI.prototype.handleMouseOutFromSearchUI = function () {
 };
 
 HotSearchKeywordUI.prototype.handleMouseClickOnSearchUI = function () {
-  this.clicked = true;
   hideTarget(this.rollingPage);
   emphasisOn(this.searchBox);
   this.searchWindow.value !== '' ? showTarget(this.relatedTermBox) : showTarget(this.hotKeywordBox);
 };
+
 HotSearchKeywordUI.prototype.controllMouseEvent = function () {
   const clickArea = this.searchBox.firstElementChild.closest('.search_box');
   clickArea.addEventListener('click', this.handleMouseClickOnSearchUI.bind(this));
