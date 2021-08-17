@@ -26,8 +26,7 @@ export class LoaderFromJson {
       if (imgurl) imgUrlArr.push(imgurl);
     });
 
-    if (this.value === 'carousel')
-      return new CarouselMaker(null, null, imgUrlArr, this.value);
+    if (this.value === 'carousel') return new CarouselMaker(null, null, imgUrlArr, this.value);
     if (this.value === 'banner') return new BannerImgMaker(imgUrlArr);
     if (this.value === 'view_more' || this.value === 'view_more_basic')
       return new ViewMoreManager(titleArr, descArr, imgUrlArr, this.value);

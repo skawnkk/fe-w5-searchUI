@@ -13,7 +13,7 @@ const makeHotKeywordTpl = function (
     </ul></div>`;
   });
   const tempBox = _.create('div');
-  tempBox.insertAdjacentHTML('beforeEnd', tempDiv);
+  tempBox.innerHTML = tempDiv;
   renderPlace.insertAdjacentElement(direction, tempBox);
 };
 

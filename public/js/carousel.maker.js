@@ -5,8 +5,7 @@ export class CarouselMaker {
     this.titleArr = titleArr;
     this.descArr = descArr;
     this.imgUrlArr = imgUrlArr;
-    this.slideArea =
-      id === 'carousel' ? _.$('.main_carousel') : _.$('.hot_deal_list');
+    this.slideArea = id === 'carousel' ? _.$('.main_carousel') : _.$('.hot_deal_list');
     this.slideLi;
     this.id = id;
     this.count = 0;

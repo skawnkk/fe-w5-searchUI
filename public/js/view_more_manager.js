@@ -11,6 +11,7 @@ export class ViewMoreManager {
   }
 
   makeTpl() {
+    //🤔돔 조작을 더 줄일 순 없을까? (기존데이터는 유지하면서...)
     const filteredArr = this.title.filter((_, i) => i < this.range);
     filteredArr.forEach((v, i) => {
       const viewMoreLi = document.createElement('li');

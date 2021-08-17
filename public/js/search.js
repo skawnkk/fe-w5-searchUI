@@ -26,6 +26,15 @@ SearchUI.prototype.storeSearchTerm = function (keyword = this.searchHistory) {
   this.viewKeywordHistory(this.dataKey);
 };
 
+SearchUI.prototype.viewKeywordHistory = function (dataKey) {
+  this.historyKeywordBox = _.$('.searched_keyword_tpl');
+  this.historyKeywordBox.innerHTML = '';
+  //🤔 수정하고 싶은 부분
+  validHistoryKeyword(dataKey).map(({ term, id }) =>
+    this.historyKeywordBox.insertAdjacentElement('AfterBegin', this.makeKeywordHistoryTpl(term, id))
+  );
+};
+
 SearchUI.prototype.makeKeywordHistoryTpl = function (term, id) {
   const divEl = _.create('div');
   divEl.innerHTML = `<span id=${id}>${term}</span>`;
@@ -40,17 +49,7 @@ SearchUI.prototype.makeKeywordHistoryTpl = function (term, id) {
   divEl.appendChild(delBtn);
   return divEl;
 };
-
-SearchUI.prototype.viewKeywordHistory = function (dataKey) {
-  this.historyKeywordBox = _.$('.searched_keyword_tpl');
-  this.historyKeywordBox.innerHTML = '';
-  validHistoryKeyword(dataKey).map(({ term, id }) =>
-    this.historyKeywordBox.insertAdjacentElement('AfterBegin', this.makeKeywordHistoryTpl(term, id))
-  );
-};
-
 SearchUI.prototype.deleteSearchTerm = function (target) {
-  console.log(validHistoryKeyword(this.dataKey));
   this.searchHistory = validHistoryKeyword().filter((el) => {
     return +target.previousSibling.id !== el.id;
   });
@@ -61,7 +60,6 @@ SearchUI.prototype.controllKeybordEvent = function () {
   this.searchWindow.addEventListener('keydown', ({ key }) => this.controllKeyEvent(key));
   this.searchForm.addEventListener('submit', (evt) => {
     evt.preventDefault();
-    console.log(2);
     const submittedKeyword = {
       term: this.searchWindow.value,
       id: evt.timeStamp,
