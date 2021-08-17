@@ -1,6 +1,6 @@
-@import "./reset.css";
-@import "./carousel.scss";
-@import "./icon.scss";
+@import './reset.css';
+@import './carousel.scss';
+@import './icon.scss';
 
 $menu_interval: 0.5rem;
 $color-emphasis: #f9624c;
@@ -37,7 +37,7 @@ button {
 
 body {
   background-color: $color-background-beige;
-  font-family: "Nanum Gothic", sans-serif;
+  font-family: 'Nanum Gothic', sans-serif;
   box-sizing: border-box;
 }
 
@@ -331,7 +331,7 @@ p {
       text-align: center;
       overflow: hidden;
 
-      .slide_second_position {
+      .main_carousel {
         display: flex;
       }
     }

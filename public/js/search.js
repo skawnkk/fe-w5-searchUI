@@ -1,252 +1,320 @@
 import {
-   _, getData, emphasisOn, emphasisOff, hideTarget, showTarget
-} from "./util.js";
+  _,
+  emphasisOn,
+  getDataFromAPI,
+  emphasisOff,
+  hideTarget,
+  showTarget,
+} from './util.js';
+import { URL } from './url.js';
 
-export function SearchUI(){ 
-   this.searchWindow = _.$('.search_input');   
-   this.searchBox = _.$('.search_box'); 
-   this.searchArea = _.$('.search');  
-   this.searchForm = _.$('.search_form');  
-   this.hotKeywordBox=_.$('.hot_keyword_tpl');
-   this.relatedTermBox= _.$('.related_term_tpl');
-   this.searchedKeywordBox = _.$('.searched_keyword_tpl');
-   this.rollingPage;
-   this.popularSearchTerm;
-   this.relatedTermArr;
-   this.clicked=false;
-   this.arrNumber = -1;
-   this.dataKey ='recentSearchTerms';
-   this.dataArr = [];
-   this.loadedDataArr;
-   this.delBtn=_.$('.delete');
+export function SearchUI() {
+  this.searchWindow = _.$('.search_input');
+  this.searchBox = _.$('.search_box');
+  this.searchArea = _.$('.search');
+  this.searchForm = _.$('.search_form');
+  this.hotKeywordBox = _.$('.hot_keyword_tpl');
+  this.relatedTermBox = _.$('.related_term_tpl');
+  this.historyKeywordBox = _.$('.searched_keyword_tpl');
+  this.rollingPage;
+  this.relatedTermArr;
+  this.clicked = false;
+  this.arrNumber = -1;
+  this.dataKey = 'recentSearchTerms';
+  this.searchHistory = [];
+  this.loadedDataArr;
+  this.delBtn = _.$('.delete');
 }
 
-SearchUI.prototype.init = function(){
-   this.getInitialData();
-   this.realtimeSearch();
-   this.eventControll();
-   this.loadSearchTerm();
-}
+//🥑인기검색어- 데이터& rollingPage & box init
+SearchUI.prototype.getHotKeyword = async function () {
+  const { list } = await getDataFromAPI(URL.SEARCH_KEYWORD);
+  const popularSearchTerm = list.map((el) => el.keyword).slice(0, 10);
+  this.renderRollingKeyword(popularSearchTerm);
+  this.renderKeywordBox(popularSearchTerm);
+};
 
-SearchUI.prototype.getInitialData = async function(){
-   const url = 'https://shoppinghow.kakao.com/v1.0/shophow/top/recomKeyword.json?_=1615192416887';
-   const {list} = await getData(url);
-   this.popularSearchTerm = list.map(el=>el.keyword).slice(0,10);
-  
-   this.renderRollingKeyword();
-   this.renderKeywordBox();
-   
-}
+SearchUI.prototype.renderRollingKeyword = function (popularSearchTerm) {
+  const tplInfo = {
+    keywords: popularSearchTerm,
+    startNumber: 1,
+    renderPlace: this.searchWindow,
+    direction: 'beforeBegin',
+  };
+  makeHotKeywordTpl(popularSearchTerm, tplInfo);
 
-SearchUI.prototype.eventControll = function(){
-   this.controllMouseEvent();
-   this.searchWindow.addEventListener('keydown', ({key})=>this.controllKeyEvent(key));
-   this.searchForm.addEventListener('submit', (evt)=>{
-      evt.preventDefault()
+  this.searchBox.firstElementChild.className = 'rolling_keyword';
+  this.rollingPage = _.$('.rolling_keyword');
+  this.rollupKeyword();
+};
 
-      const submittedData = {
-         term: this.searchWindow.value,
-         id: evt.timeStamp
-      }
-      
-      if(this.dataArr>5) this.dataArr.shift();
-      this.dataArr.push(submittedData);
-      this.pasteSearchedTerms(submittedData.term, submittedData.id);
+SearchUI.prototype.rollupKeyword = function () {
+  this.checkSetTimeout();
+};
 
-      this.searchWindow.value="";
-      this.searchWindow.blur();
-      hideTarget(this.hotKeywordBox);
-      hideTarget(this.relatedTermBox);
-   });
-}
+SearchUI.prototype.checkSetTimeout = function () {
+  this.clicked === false
+    ? setTimeout(this.moveNode.bind(this), 2500)
+    : clearTimeout(this.moveNode);
+};
 
-SearchUI.prototype.storeSearchTerm = function(){
-   localStorage.setItem(this.dataKey, JSON.stringify(this.dataArr));
-}
+SearchUI.prototype.moveNode = function () {
+  this.rollingPage.style.transition = '1s';
+  this.rollingPage.style.transform = `translateY(-50px)`;
 
-SearchUI.prototype.loadSearchTerm = function(){
-   const loadedDataObj = localStorage.getItem(this.dataKey);
+  setTimeout(() => {
+    const first = this.rollingPage.firstElementChild;
+    this.rollingPage.appendChild(first);
+    this.rollingPage.style.transition = 'none';
+    this.rollingPage.style.transform = 'translateY(0px)';
+  }, 1000);
 
-   if(loadedDataObj!==null){
-      this.loadedDataArr = JSON.parse(loadedDataObj);
-      this.loadedDataArr.forEach(({term, id})=>this.pasteSearchedTerms(term, id))
-   }
-}
+  this.checkSetTimeout();
+};
+//🥑인기검색어- 박스
+SearchUI.prototype.renderKeywordBox = function (popularSearchTerm) {
+  const tempTitle = `<div>인기 쇼핑 키워드</div>`;
+  this.hotKeywordBox.insertAdjacentHTML('afterBegin', tempTitle);
+  const halfArr = popularSearchTerm.filter(
+    (v, i) => i < popularSearchTerm.length / 2
+  );
+  const tplInfo1To5 = {
+    keywords: halfArr,
+    startNumber: 1,
+    renderPlace: this.hotKeywordBox,
+    direction: 'beforeEnd',
+  };
+  makeHotKeywordTpl(popularSearchTerm, tplInfo1To5);
 
-SearchUI.prototype.pasteSearchedTerms = function(term, id){
+  tplInfo1To5.startNumber = 6;
+  makeHotKeywordTpl(popularSearchTerm, tplInfo1To5);
+};
 
-   const divEl =_.create('div');
-   divEl.innerHTML = `<span>${term}</span>`;
-   divEl.id = id;
+//🍒검색창-입력
+SearchUI.prototype.onEvents = function () {
+  this.controllMouseEvent();
+  this.controllKeybordEvent();
+};
 
-   const delBtn = _.create('span');
-   delBtn.className = 'delete';
-   delBtn.innerText = 'ⅹ';
-   delBtn.addEventListener('click',({target})=>this.deleteSearchTerm(target));
+SearchUI.prototype.storeSearchTerm = function (keyword = this.searchHistory) {
+  this.dataKey = 'recentSearchTerm';
+  localStorage.setItem(this.dataKey, JSON.stringify(keyword));
+  this.viewKeywordHistory(this.dataKey);
+};
 
-   divEl.appendChild(delBtn);
-   this.searchedKeywordBox.insertAdjacentElement('AfterBegin', divEl);
-   this.storeSearchTerm();
-}
+SearchUI.prototype.viewKeywordHistory = function (dataKey) {
+  this.loadedDataArr = validHistoryKeyword(dataKey);
+  this.historyKeywordBox = _.$('.searched_keyword_tpl');
+  this.historyKeywordBox.innerHTML = '';
+  this.loadedDataArr.map(({ term, id }) =>
+    this.historyKeywordBox.insertAdjacentElement(
+      'AfterBegin',
+      makeKeywordHistoryTpl(term, id)
+    )
+  );
+};
 
-SearchUI.prototype.deleteSearchTerm = function(target){
-   
-   this.searchedKeywordBox.removeChild(target.parentNode);
-   const updatedArr =this.dataArr.filter(el=>(el.id!==target.parentNode.id));
-   this.dataArr = updatedArr;
-   this.storeSearchTerm();
-}
+SearchUI.prototype.deleteSearchTerm = function (target) {
+  this.loadedDataArr = validHistoryKeyword();
+  this.searchHistory = this.loadedDataArr.filter((el) => {
+    return +target.previousSibling.id !== el.id;
+  });
+  this.storeSearchTerm(this.searchHistory);
+};
 
-SearchUI.prototype.controllMouseEvent = function(){
-   const clickArea = this.searchBox.firstElementChild.closest('.search_box');
-   clickArea.addEventListener('click',()=>{
-      this.clicked =true;
-      hideTarget(this.rollingPage);
+SearchUI.prototype.controllKeybordEvent = function () {
+  this.searchWindow.addEventListener('keydown', ({ key }) =>
+    this.controllKeyEvent(key)
+  );
+  this.searchForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
 
-      emphasisOn(this.searchBox);
-      (this.searchWindow.value!=='')? showTarget(this.relatedTermBox) :showTarget(this.hotKeywordBox);
-   })
+    const submittedKeyword = {
+      term: this.searchWindow.value,
+      id: evt.timeStamp,
+    };
 
-   this.searchArea.addEventListener("mouseleave", ()=>setTimeout(()=>{
-      if(this.searchWindow.value==='') {
-         this.clicked = false;
-         showTarget(this.rollingPage);
+    if (this.searchHistory.length > 5) this.searchHistory.shift();
+    this.searchHistory.push(submittedKeyword);
+    this.storeSearchTerm(this.searchHistory);
+
+    this.searchWindow.value = '';
+    this.searchWindow.blur();
+    hideTarget(this.hotKeywordBox);
+    hideTarget(this.relatedTermBox);
+  });
+};
+SearchUI.prototype.controllMouseEvent = function () {
+  const handleMouseClickOnSearchUI = () => {
+    this.clicked = true;
+    hideTarget(this.rollingPage);
+
+    emphasisOn(this.searchBox);
+    this.searchWindow.value !== ''
+      ? showTarget(this.relatedTermBox)
+      : showTarget(this.hotKeywordBox);
+  };
+
+  const handleMouseOutFromSerchUI = () => {
+    setTimeout(() => {
+      if (this.searchWindow.value === '') {
+        this.clicked = false;
+        showTarget(this.rollingPage);
       }
 
       hideTarget(this.relatedTermBox);
       hideTarget(this.hotKeywordBox);
       emphasisOff(this.searchBox);
-   }, 200));
-}
+    }, 200);
+  };
 
-SearchUI.prototype.renderRollingKeyword = function(){
-   this.makeTpl(this.popularSearchTerm, 1, this.searchWindow, 'beforeBegin');
-   this.searchBox.firstElementChild.className="rolling_keyword";
-   this.rollingPage = _.$('.rolling_keyword');
-   this.rollupKeyword();
-}
+  const clickArea = this.searchBox.firstElementChild.closest('.search_box');
+  clickArea.addEventListener('click', handleMouseClickOnSearchUI);
+  this.searchArea.addEventListener('mouseleave', handleMouseOutFromSerchUI);
+};
 
-SearchUI.prototype.checkSetTimeout = function(){
-   (this.clicked===false)? setTimeout(this.moveNode.bind(this), 2500):clearTimeout(this.moveNode);
-}
+//🍒 검색창입력 - 연관검색어
+SearchUI.prototype.realtimeSearch = function () {
+  let timer;
+  this.searchWindow.addEventListener('input', (e) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(async () => {
+      const searchingWord = this.searchWindow.value;
+      if (searchingWord === '') {
+        hideTarget(this.relatedTermBox);
+        showTarget(this.hotKeywordBox);
+        return;
+      }
+      const { suggestions, prefix } = await getDataFromAPI(
+        URL.AMAZON_SEARCH(searchingWord)
+      );
+      this.relatedTermArr = suggestions.map((el) => el.value);
+      this.renderRelatedTerm(this.relatedTermArr, prefix);
+    }, 200);
+  });
+};
 
-SearchUI.prototype.rollupKeyword= function(){
-   this.checkSetTimeout();
-}
+SearchUI.prototype.renderRelatedTerm = function (relatedKeyword, inputTerm) {
+  while (this.relatedTermBox.firstChild) {
+    this.relatedTermBox.removeChild(this.relatedTermBox.firstChild);
+  }
 
-SearchUI.prototype.moveNode = function(){
-   this.rollingPage.style.transition = '1s';
-   this.rollingPage.style.transform =`translateY(-50px)`;
+  this.relatedTermBox.insertAdjacentHTML(
+    'beforeEnd',
+    makeEmphasisOnTpl(relatedKeyword, inputTerm)
+  );
 
-   setTimeout(() => {
-      const first = this.rollingPage.firstElementChild;
-      this.rollingPage.appendChild(first);
-      this.rollingPage.style.transition ='none';
-      this.rollingPage.style.transform ='translateY(0px)';
-   },1000)
+  if (this.relatedTermArr.length === 0) {
+    hideTarget(this.relatedTermBox);
+    return;
+  }
 
-   this.checkSetTimeout();
-}
+  showTarget(this.relatedTermBox);
+  hideTarget(this.hotKeywordBox);
+};
 
-SearchUI.prototype.renderKeywordBox= function(){
-   const tempTitle = `<div>인기 쇼핑 키워드</div>`;
-   this.hotKeywordBox.insertAdjacentHTML('afterBegin', tempTitle);
-   const halfArr =this.popularSearchTerm.filter((v,i)=>i<this.popularSearchTerm.length/2)
- 
-   this.makeTpl(halfArr, 1, this.hotKeywordBox,'beforeEnd');
-   this.makeTpl(halfArr, 6,  this.hotKeywordBox, 'beforeEnd');
-}
+SearchUI.prototype.controllKeyEvent = function (key) {
+  if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Escape') return;
 
-SearchUI.prototype.realtimeSearch = function(){
-   let timer;
-   this.searchWindow.addEventListener('input', (e)=>{
+  const turnOffRelatedKeyword = () => {
+    hideTarget(this.relatedTermBox);
+    showTarget(this.rollingPage);
+    this.arrNumber = -1;
+    this.clicked = false;
+    return;
+  };
 
-      if (timer)  clearTimeout(timer);
-      timer = setTimeout(async ()=>{
-         const searchingWord = this.searchWindow.value;
-         if (searchingWord==='') {
-            hideTarget(this.relatedTermBox);
-            showTarget(this.hotKeywordBox);
-            return;
-         }
-         const relatedLink = `https://completion.amazon.com/api/2017/suggestions?mid=ATVPDKIKX0DER&alias=aps&suggestion-type=KEYWORD&prefix=${searchingWord}`;
-         const {suggestions, prefix} = await getData(relatedLink);
-         this.relatedTermArr = suggestions.map(el=>el.value);
-         this.renderRelatedTerm(this.relatedTermArr, prefix);
-        }, 200);
-   })
-}
+  const reltermDivs = Array.from(this.relatedTermBox.children);
+  if (reltermDivs.length === 0) return; //연관검색어가 존재하지 않는 경우
 
-SearchUI.prototype.renderRelatedTerm = function(resArray, inputTerm){
-   while(this.relatedTermBox.firstChild) {
-      this.relatedTermBox.removeChild(this.relatedTermBox.firstChild); 
-   }
-   resArray.forEach(el=> {
-      el = this.colorMatchingStr(el, inputTerm);
-      const divEl = `<div>${el}</div>`;
-      this.relatedTermBox.insertAdjacentHTML('beforeEnd', divEl);
-   });
-   if(this.relatedTermArr.length===0) {
-      hideTarget(this.relatedTermBox);
-      return;
-   }
-   showTarget(this.relatedTermBox);
-   hideTarget(this.hotKeywordBox);
-}
+  switch (key) {
+    case 'ArrowUp':
+      this.arrNumber -= 1;
+      break;
+    case 'ArrowDown':
+      if (this.arrNumber < 0) showTarget(this.relatedTermBox);
+      this.arrNumber += 1;
+      break;
+    default:
+      turnOffRelatedKeyword();
+  }
 
-SearchUI.prototype.colorMatchingStr = function(el, inputTerm){
-   const matchingOption = new RegExp(inputTerm);
-   return el.replace(matchingOption.exec(el),`<span class="emphasis_text">${matchingOption.exec(el)}</span>`);
-}
+  if (this.arrNumber > reltermDivs.length - 1 || this.arrNumber < 0) {
+    turnOffRelatedKeyword();
+  }
 
-SearchUI.prototype.makeTpl = function(arr, startNumber, pasteArea, place){
-   const tempBox = _.create('div');
-   arr.forEach((v, idx)=>{
-      const tempDiv = 
-      `<div><ul>
-         <span class="kwd_number">${idx+startNumber}</span>
-         <span>${this.popularSearchTerm[idx+startNumber-1]}</span>
-      </ul></div>`;
-      tempBox.insertAdjacentHTML('beforeEnd', tempDiv)
-   });
-   pasteArea.insertAdjacentElement(place, tempBox);
-}
+  reltermDivs.forEach((el) => {
+    if (el.classList.contains('keybord_focus'))
+      el.classList.remove('keybord_focus');
+  });
 
-SearchUI.prototype.controllKeyEvent = function(key){
-   if(key!=='ArrowDown'&&key!=='ArrowUp'&&key!=='Escape') return;
-   const reltermDivs = Array.from(this.relatedTermBox.children);
-   if(reltermDivs.length===0) return; //연관검색어가 존재하지 않는 경우
+  reltermDivs[this.arrNumber].classList.add('keybord_focus');
 
-   switch (key) {
-      case 'ArrowUp':
-         this.arrNumber-=1;
-         break;
-      case 'ArrowDown':
-         if(this.arrNumber<0) showTarget(this.relatedTermBox);
-         this.arrNumber+=1;
-         break;
-      default:
-         hideTarget(this.relatedTermBox);
-         this.arrNumber = -1;
-         showTarget(this.rollingPage);
-         this.clicked = false;
-         return;
-   }  
+  const focusedKey = _.$('.keybord_focus');
+  this.searchWindow.value = focusedKey.innerText;
+};
 
-   if(this.arrNumber>reltermDivs.length-1 || this.arrNumber<0) {
-      hideTarget(this.relatedTermBox);
-      this.arrNumber = -1;
-      showTarget(this.rollingPage);
-      this.clicked = false;
-      return;
-   }
+SearchUI.prototype.init = function () {
+  this.getHotKeyword();
+  this.realtimeSearch();
+  this.onEvents();
+  //this.loadSearchTerm();
+  this.viewKeywordHistory();
+};
 
-   reltermDivs.forEach(el=>{
-      if(el.classList.contains('keybord_focus'))el.classList.remove('keybord_focus');
-   });
+//...............................................................................
+// 🥑 인기검색어 템플릿
+const makeHotKeywordTpl = function (
+  popularSearchTerm,
+  { keywords, startNumber, renderPlace, direction }
+) {
+  let tempDiv = '';
+  keywords.forEach((v, idx) => {
+    tempDiv += `<div><ul>
+    <span class="kwd_number">${idx + startNumber}</span>
+    <span>${popularSearchTerm[idx + startNumber - 1]}</span>
+    </ul></div>`;
+  });
+  const tempBox = _.create('div');
+  tempBox.insertAdjacentHTML('beforeEnd', tempDiv);
+  renderPlace.insertAdjacentElement(direction, tempBox);
+};
 
-   reltermDivs[this.arrNumber].classList.add('keybord_focus');
+//🍒검색창입력 - 연관검색어 tpl
+const makeEmphasisOnTpl = (relatedKeyword, inputTerm) => {
+  let relatedKeywordTpl = ``;
+  relatedKeyword.forEach((el) => {
+    el = colorMatchingSameKeyword(el, inputTerm);
+    relatedKeywordTpl += `<div>${el}</div>`;
+  });
+  return relatedKeywordTpl;
+};
+const colorMatchingSameKeyword = (el, inputTerm) => {
+  const matchingOption = new RegExp(inputTerm);
+  return el.replace(
+    matchingOption.exec(el),
+    `<span class="emphasis_text">${matchingOption.exec(el)}</span>`
+  );
+};
 
-   const focusedKey = _.$('.keybord_focus');
-   this.searchWindow.value = focusedKey.innerText;
-}
+//🍒검색창입력 - 검색이력Tpl
+const makeKeywordHistoryTpl = (term, id) => {
+  const divEl = _.create('div');
+  divEl.innerHTML = `<span id=${id}>${term}</span>`;
+
+  const delBtn = _.create('span');
+  delBtn.className = 'delete';
+  delBtn.innerText = 'ⅹ';
+  delBtn.addEventListener('click', ({ target }) => {
+    SearchUI.prototype.deleteSearchTerm(target);
+  });
+
+  divEl.appendChild(delBtn);
+  return divEl;
+};
+
+const validHistoryKeyword = (dataKey = 'recentSearchTerms') => {
+  console.log('?', dataKey);
+  const loadedDataObj = localStorage.getItem(dataKey);
+  return !loadedDataObj ? [] : JSON.parse(loadedDataObj);
+};
