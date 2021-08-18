@@ -4,6 +4,7 @@ import { HotSearchKeywordUI } from './search.hot.js';
 import { CarouselCtroller } from './carousel.ctrl.js';
 import { RequestData } from './request_data.js';
 import { URL } from './url.js';
+import { viewMoreUrlSetting } from './view_more_manager';
 
 const { CAROUSEL_API, VIEW_MORE_API, VIEW_MORE_API_CUSTOM } = URL;
 const requestInfoForSection1_carousel = 'mileageList';
@@ -39,15 +40,6 @@ const ctrlHotDealCarousel = () => {
     value: 'carousel_hot',
   };
   return new CarouselCtroller(carouselObj);
-};
-
-const viewMoreUrlSetting = () => {
-  while (count < 5) {
-    count++;
-    let viewMoreUrl = VIEW_MORE_API_CUSTOM(count);
-
-    return new RequestData(viewMoreUrl, requestInfoForSection2_view_more, 'view_more');
-  }
 };
 
 const ctrlViewMoreBtn = () => {
