@@ -5,7 +5,9 @@
   "main": "express.js",
   "scripts": {
     "build": "node-sass public/style/style.scss public/style/style.css && node-sass --watch public/style/style.scss public/style/style.css",
-    "dev": "nodemon express.js -e js,json"
+    "dev": "nodemon express.js -e js,json",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "repository": {
     "type": "git",
@@ -17,13 +19,14 @@
   "bugs": {
     "url": "https://github.com/skawnkk/fe-w5-searchUI"
   },
-  "homepage": "https://github.com/skawnkk/fe-w5-searchUI#readme",
+  "homepage": "https://skawnkk.github.io/shoppingHow/",
   "devDependencies": {
     "node-sass": "^5.0.0",
     "nodemon": "^2.0.7",
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "gh-pages": "^3.2.3"
   }
 }
