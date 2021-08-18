@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node-sass public/style/style.scss public/style/style.css && node-sass --watch public/style/style.scss public/style/style.css",
     "dev": "nodemon express.js -e js,json",
-    "predeploy": "npm run build",
+    "predeploy": "npm run dev",
     "deploy": "gh-pages -d build"
   },
   "repository": {
