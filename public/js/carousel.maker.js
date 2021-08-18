@@ -1,5 +1,5 @@
 import { _ } from './util/util.js';
-
+const NUMBER_TO_SHOW = 5;
 export class CarouselMaker {
   constructor(titleArr, descArr, imgUrlArr, id) {
     this.titleArr = titleArr;
@@ -31,28 +31,26 @@ export class CarouselMaker {
   }
 
   makeHotDealTpl() {
-    this.slideArea = _.$('.hot_deal_list');
-
+    let carouseolTpl = '';
     for (let i = 0; i < this.titleArr.length; i++) {
-      if (i % 5 === 0) {
-        this.slideLi = document.createElement('ul');
-        this.slideLi.className = 'panel';
+      if (i % NUMBER_TO_SHOW === 0) {
+        carouseolTpl += `<ul class='panel'>`;
       }
-
-      const slideDiv = document.createElement('div');
-      slideDiv.className = 'panel_list';
-      slideDiv.innerHTML = `<a href="#">
-            <img
-               src="${this.imgUrlArr[i]}"></img>
+      carouseolTpl += `
+        <div class='panel_list'> 
+          <a href="#">
+            <img src="${this.imgUrlArr[i]}"></img>
             <p>${this.titleArr[i]}</p>
             <span>${this.descArr[i]}</span>
             <span class="theme_icon">테마</span>
-         </a>`;
+          </a>  
+        </div>`;
 
-      this.slideLi.insertAdjacentElement('beforeEnd', slideDiv);
-      if (this.slideLi.children.length === 5)
-        this.slideArea.insertAdjacentElement('beforeEnd', this.slideLi);
+      if (i % NUMBER_TO_SHOW === NUMBER_TO_SHOW - 1) {
+        carouseolTpl += `</ul>`;
+      }
     }
+    this.slideArea.innerHTML = carouseolTpl;
   }
 
   checkArrLength() {

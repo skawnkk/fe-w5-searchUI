@@ -8,7 +8,7 @@ export class CarouselCtroller {
     this.value = obj.value;
     this.size = Number(getComputedStyle(this.area).width.replace(/[p-x]/g, ''));
     this.pagingSpeed = 0.4;
-    this.picNumber;
+    this.picNumber = 1;
     this.play();
   }
 
@@ -19,31 +19,27 @@ export class CarouselCtroller {
       this.area.style.transition = `transform ${this.pagingSpeed}s`;
     });
   }
+  handleTransitioned() {
+    let lastImg = _.$(`#first_clone_${this.value}`);
+    let firstImg = _.$(`#last_clone_${this.value}`);
 
+    if (this.area.children[this.picNumber] === lastImg) {
+      this.picNumber = 1;
+      this.area.style.transform = `translate(${-this.size * this.picNumber}px)`;
+      this.area.style.transition = 'none';
+    }
+
+    if (this.area.children[this.picNumber] === firstImg) {
+      this.picNumber = this.area.children.length - 2;
+      this.area.style.transform = `translate(${-this.size * this.picNumber}px)`;
+      this.area.style.transition = 'none';
+    }
+  }
   play() {
-    this.picNumber = 1;
     this.area.style.transform = `translate(${-this.size * this.picNumber}px)`;
     const prevNextBtn = [this.prev, this.next];
     prevNextBtn.forEach((el) => this.addClickEvent(el));
 
-    this.area.addEventListener('transitionend', () => {
-      let lastImg = _.$(`#first_clone_${this.value}`);
-      let firstImg = _.$(`#last_clone_${this.value}`);
-      if (this.area.children[this.picNumber] === lastImg) {
-        this.picNumber = 1;
-        this.area.style.transform = `translate(${
-          -this.size * this.picNumber
-        }px)`;
-        this.area.style.transition = 'none';
-      }
-
-      if (this.area.children[this.picNumber] === firstImg) {
-        this.picNumber = this.area.children.length - 2;
-        this.area.style.transform = `translate(${
-          -this.size * this.picNumber
-        }px)`;
-        this.area.style.transition = 'none';
-      }
-    });
+    this.area.addEventListener('transitionend', this.handleTransitioned.bind(this));
   }
 }
