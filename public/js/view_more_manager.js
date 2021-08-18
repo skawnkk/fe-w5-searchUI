@@ -37,34 +37,3 @@ export class ViewMoreManager {
     this.makeTpl();
   }
 }
-
-const resetViewMoreSection = () => {
-  let viewMores = _.$('.evt_list .panel');
-  while (viewMores.childNodes.length) {
-    viewMores.removeChild(viewMores.firstChild);
-  }
-
-  playViewMore();
-  count = 0;
-  changeButton(count);
-};
-
-const changeButton = (count) => {
-  let newBtn = count === 0 ? document.createTextNode('더보기') : document.createTextNode(' 접기');
-
-  const block = _.$('.see_more_btn');
-  block.removeChild(block.firstChild);
-  block.appendChild(newBtn);
-};
-
-export const viewMoreUrlSetting = () => {
-  var viewMorePage = 2;
-  while (count < viewMorePage) {
-    count++;
-    let viewMoreUrl = URL.VIEW_MORE_API_CUSTOM(count);
-    if (count === viewMorePage) changeButton(count);
-    return new RequestData(viewMoreUrl, requestInfoForSection2_view_more, 'view_more');
-  }
-
-  resetViewMoreSection();
-};
