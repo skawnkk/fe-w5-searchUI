@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/skawnkk/fe-w5-searchUI"
   },
-  "homepage": "https://skawnkk.github.io/shoppingHow/",
+  "homepage": "https://skawnkk.github.io/shoppingHow/public/index.html",
   "devDependencies": {
     "node-sass": "^5.0.0",
     "nodemon": "^2.0.7",
