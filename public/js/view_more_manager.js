@@ -1,5 +1,7 @@
 import { _ } from './util/util.js';
 
+import { URL } from './url.js';
+
 export class ViewMoreManager {
   constructor(titleArr, descArr, imgUrlArr, value) {
     this.title = titleArr;

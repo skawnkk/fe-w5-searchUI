@@ -14,7 +14,7 @@ $color-transparent: #22222200;
 
 button {
   color: $color-transparent;
-  box-sizing: border-box;
+
   border: none;
   cursor: pointer;
 }
@@ -36,9 +36,9 @@ button {
 }
 
 body {
+  box-sizing: border-box !important;
   background-color: $color-background-beige;
   font-family: 'Nanum Gothic', sans-serif;
-  box-sizing: border-box;
 }
 
 a {
@@ -50,14 +50,10 @@ p {
   font-weight: 800;
 }
 
-.wrap {
-  width: 75vw;
-  margin: 0px auto;
-  padding: 0;
-}
-
 //header
 .header {
+  min-width: 1278px;
+  padding: 0 200px;
   background-color: $color-background-white;
   border-bottom: 1.5px solid $color-css-grey;
 }
@@ -66,7 +62,6 @@ p {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
   margin: 0 auto;
   padding: 60px 0;
   border-bottom: 1px solid $color-css-grey;
@@ -86,10 +81,9 @@ p {
 
   .search_box {
     width: 650px;
-    height: 70px;
+    height: 50px;
     border-radius: 10px;
     border: 1px solid $color-css-grey;
-    box-sizing: border-box;
     padding: 1vh;
     overflow-y: hidden;
 
@@ -221,7 +215,6 @@ p {
 
     div {
       width: -webkit-fill-available;
-      box-sizing: border-box;
       padding: 5px 30px;
       font-size: 14px;
       &:hover {
@@ -233,8 +226,12 @@ p {
 }
 
 .navigator {
+  min-width: 1278px;
+  max-width: 1700px;
   display: flex;
   justify-content: space-between;
+
+  margin: 10px auto;
   padding: 20px 0;
   * {
     display: flex;
@@ -307,7 +304,12 @@ p {
 }
 
 /*body*/
-
+.body {
+  min-width: 1278px;
+  max-width: 1700px;
+  margin: 10px auto;
+  padding: 0 200px;
+}
 .section_top {
   background-color: $color-background-white;
   margin-top: 30px;
@@ -366,7 +368,10 @@ p {
 
 //evt_list && hot_deal 공통사용.
 .panel {
+  // overflow: auto;
   display: grid;
+  min-width: 1278px;
+  max-width: 1700px;
   grid-template-columns: repeat(5, 1fr);
   .panel_list {
     border-right: 1px solid $color-css-grey;
@@ -415,6 +420,8 @@ p {
 }
 
 .section_hot_deal {
+  min-width: 1278px;
+  max-width: 1700px;
   margin: 60px auto;
 
   h3 {
@@ -435,16 +442,10 @@ p {
         border: none;
       }
       .panel {
-        width: 100%;
-        border-top: 1px solid $color-css-grey;
-        border-left: 1px solid $color-css-grey;
-        border-bottom: none;
-        .panel_list {
-          width: 232px;
-          background-color: $color-background-white;
-        }
+        background-color: white;
       }
     }
+
     .slide_ctrl {
       display: flex;
       justify-content: space-between;
